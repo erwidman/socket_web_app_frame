@@ -9,32 +9,64 @@ class Socket{
 	
 
 
-	constructor(ip,room){
+	constructor(ip,room,type,persist){
 		
 		this.ip = ip;
 		this.room = room;
-		this.emitEnabled = true;
+		this.persist = persist;
 
-		var connected = false;
-		var tmpClass = this;
+		setSocket(this);
 		var scriptURL = ip+'/socket.io/socket.io.js';
+		var tmpSocket;
 		jQuery.getScript(scriptURL,function(data,textStatus,jqxhr){
-				 var tmpSocket =  io.connect(ip,{query:'room='+room});
-				 tmpSocket.once('connect',function(){
-					console.log('::socket succesfully instantiated' + room);
-					this.disconnect();
-					//todo
-				});
+				 tmpSocket =  io.connect(ip,{query:'room='+room+'&type='+type});
+				 if(!persist){
+					 tmpSocket.once('connect',function(){
+						this.disconnect();
+					});
+				}
 		});
-	
 
+	
+		var waitFunction;
+		function setSocket(s){
+			clearTimeout(waitFunction);
+			waitFunction = 
+			setTimeout(function(){
+				if(tmpSocket){
+					s.emitEnabled = true;
+					s.sok = tmpSocket;
+					console.log(tmpSocket);
+				}
+				else{
+					setSocket(s);
+				}
+			},100);
+		}
+
+		setTimeout(function(fix){
+			console.log(fix);
+		},1000,this);
 	}
 
-	sendToServer(data){
+	sendToServer(event,killEvent,data,callback){
+		var persist = this.persist;
+		data = {data: data, returnEvent: killEvent};
+		console.log(data);
 		if(this.emitEnabled){
-			this.sok.connect();
-			this.sok.once('connect',function(socket){
-				this.sok.emit('sendData',data);
+			if(!persist){
+				this.sok.connect();
+				this.sok.once('connect',function(){
+					this.emit(event,data);
+				});
+			}
+			else
+				this.sok.emit(event,data);
+
+			this.sok.once(killEvent,function(returnData){
+				callback(returnData);
+				if(!persist)
+					this.disconnect();
 			});
 		}
 	}

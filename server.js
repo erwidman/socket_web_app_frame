@@ -16,24 +16,35 @@ server.listen(4040);
 var manager = new SocketManager(server);
 
 
-var defaultEvents =
-[
-		{
-			name: 'sendData',
-			callback : 
-					function(data){
-						console.log(data);
-					}
-		}
-];
-
-
-var roomDefinitions =
+//example
+var socketDefinitions =
 {
-	'default':{
-		events: defaultEvents
-	}
+		"main": {
+			events: 
+				[
+					{
+					name: 'sendData',
+					callback : 
+							function(data){
+								console.log(data);
+								manager.respond(data.returnEvent,true,this);
+							}
+					},
+					{	
+					name: 'requestData',
+					callback : 
+							function(data){
+								console.log(data);
+								manager.respond(data.returnEvent,true,this);
+							}
+
+					}
+
+				]
+
+		}
 };
 
-manager.setRoomEvents(roomDefinitions);
+
+manager.setRoomEvents(socketDefinitions);
 

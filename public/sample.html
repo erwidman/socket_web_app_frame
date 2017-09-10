@@ -5,10 +5,16 @@
 		<script src="bundle.js"></script>
 		<script src='clientSocket.js'></script>
 		<script>	
-				var mainSocket = new Socket('http://172.31.98.192:4040','default');
+				var mainSocket = new Socket('http://localhost:4040','default','main',true);
 				setTimeout(function(mainSocket){
-					mainSocket.sendToServer(1);
+					mainSocket.sendToServer('sendData','dataREC',1,incomingData);
 				},10000,mainSocket);
+
+				function incomingData(data){
+					console.log('in incomingData');
+					console.log(data);
+				}
+
 		</script>
 	</head>
 	

@@ -2,9 +2,7 @@
 var clients = {};
 
 class SocketManager{
-	constructor(app){	
-		this.numRooms = 1;	
-		this.rooms = {};
+	constructor(app){		
 		this.io = require('socket.io')(app);
 	}
 
@@ -17,31 +15,36 @@ class SocketManager{
 	
 
 		this.io.on('connect',function(socket){
-	
+			
 			var socketRoom = socket.handshake.query.room;
 			socket.join(socketRoom);
-
-			var currRoom = roomDefinitions[socketRoom];
-			if(!this.rooms[socketRoom]){
-				this.rooms[socketRoom] = {};
-				this.numRooms++;
-			}
-			else
-				return;
-			
-			console.log("::creating eventhandlers for "+ socketRoom);
 		
-			var currRoom = roomDefinitions[socketRoom];
-			this.rooms[socketRoom].events = currRoom.events;
-			for(var j in currRoom.events){
-				var currEvent = currRoom.events[j];
-				var eventName = currEvent.name;
-				var callback = currEvent.callback;
-				console.log('::creating event ' + eventName);
-				socket.on(eventName,callback);
+			var def = roomDefinitions[socket.handshake.query.type]
+			if(def){
+				for(var i in def.events){
+					var currEvent = def.events[i];
+					var eventName = currEvent.name;
+					var callback = currEvent.callback;
+					socket.on(eventName,callback);
+				}
 			}
 		
 		});
+	}
+
+	respond(event,data,socket){
+		data = JSON.stringify(data);
+		this.io.to(socket.id).emit(event,data);
+	}
+
+	respondToRoom(event,data,room){
+		data = JSON.stringify(data);
+		this.io.to(room).emit(event,data);
+	}
+
+	globalRespond(event,data){
+		data = JSON.stringify(data);
+		this.io.emit(event,data);
 	}
 
 }
