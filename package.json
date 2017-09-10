@@ -1,0 +1,27 @@
+{
+  "name": "socket_web_app_frame",
+  "version": "1.0.0",
+  "description": "A framework and template for socket based web apps.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/widmanneric/socket_web_app_frame.git"
+  },
+  "author": "Eric Richard Widmann",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/widmanneric/socket_web_app_frame/issues"
+  },
+  "homepage": "https://github.com/widmanneric/socket_web_app_frame#readme",
+  "dependencies": {
+    "express": "*",
+    "jquery": "^3.2.1",
+    "socket.io": "*",
+    "striptags": "*",
+    "validator": "*",
+    "vm": "*"
+  }
+}
