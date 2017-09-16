@@ -28,6 +28,7 @@ var socketDefinitions =
 							function(data){
 								console.log(data);
 								manager.respond(data.returnEvent,true,this);
+								manager.respond('sampleData','sampleData',this);
 							}
 					},
 					{	
@@ -42,6 +43,19 @@ var socketDefinitions =
 
 				]
 
+		},
+		"secondary" :{
+			events:
+				[
+					{
+						name: 'test',
+						callback: function(data){
+							console.log(data);
+							manager.respond(data.returnEvent,'test response',this);
+						}
+					}
+
+				]
 		}
 };
 

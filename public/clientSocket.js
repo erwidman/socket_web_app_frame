@@ -1,33 +1,30 @@
 var jQuery = require('jquery');
 
-function setSocket(sok){
-	tmpClass.sok = sok;
-}
-
 
 class Socket{
 	
-
-
-	constructor(ip,room,type,persist){
+	constructor(ip,room,type,persist,listeners){
 		
 		this.ip = ip;
 		this.room = room;
 		this.persist = persist;
+		this.query = {query:'room='+room+'&type='+type};
+		var query = this.query;
 
 		setSocket(this);
 		var scriptURL = ip+'/socket.io/socket.io.js';
 		var tmpSocket;
 		jQuery.getScript(scriptURL,function(data,textStatus,jqxhr){
-				 tmpSocket =  io.connect(ip,{query:'room='+room+'&type='+type});
+				 tmpSocket =  io.connect(ip,query);
 				 if(!persist){
 					 tmpSocket.once('connect',function(){
-						this.disconnect();
+						this.io.disconnect();
 					});
 				}
+
 		});
 
-	
+		//attempt to set sok variable 
 		var waitFunction;
 		function setSocket(s){
 			clearTimeout(waitFunction);
@@ -36,27 +33,28 @@ class Socket{
 				if(tmpSocket){
 					s.emitEnabled = true;
 					s.sok = tmpSocket;
-					console.log(tmpSocket);
+					if(listeners)
+						s.setListeners(listeners);
 				}
 				else{
 					setSocket(s);
 				}
 			},100);
 		}
-
-		setTimeout(function(fix){
-			console.log(fix);
-		},1000,this);
 	}
 
+
+
 	sendToServer(event,killEvent,data,callback){
-		var persist = this.persist;
-		data = {data: data, returnEvent: killEvent};
-		console.log(data);
+		
 		if(this.emitEnabled){
+
+			var persist = this.persist;
+			data = {data: data, returnEvent: killEvent};
 			if(!persist){
-				this.sok.connect();
-				this.sok.once('connect',function(){
+				this.reloadSocket();
+				this.sok.once('connect',function(socket){
+					console.log(this);
 					this.emit(event,data);
 				});
 			}
@@ -66,9 +64,46 @@ class Socket{
 			this.sok.once(killEvent,function(returnData){
 				callback(returnData);
 				if(!persist)
-					this.disconnect();
+					this.io.disconnect();
 			});
 		}
+		else{
+			setTimeout(function(socket){
+				socket.sendToServer(event,killEvent,data,callback);
+			},100,this);
+		}
+
+	}
+
+	setListeners(listenDefinitions){
+		if(this.emitEnabled){
+			if(this.persist){
+				for(var i in listenDefinitions){
+					var currDef = listenDefinitions[i];
+					this.sok.on(currDef.event,currDef.callback);
+				}
+			}
+		}
+		else{
+			setTimeout(function(socket){
+				socket.setListeners(listenDefinitions);
+			},100,this);
+		}
+	}
+	
+
+	listenUntil(event,callback){
+		if(!this.persist){
+			this.reloadSocket();
+			this.sok.once(event,function(data){
+				callback(data);
+				this.io.disconnect();
+			});
+		}
+	}
+
+	reloadSocket(){
+		this.sok =  io.connect(this.ip,this.query);
 	}
 
 }//end of class

@@ -4,15 +4,29 @@
 	<head>	
 		<script src="bundle.js"></script>
 		<script src='clientSocket.js'></script>
-		<script>	
-				var mainSocket = new Socket('http://localhost:4040','default','main',true);
-				setTimeout(function(mainSocket){
-					mainSocket.sendToServer('sendData','dataREC',1,incomingData);
-				},10000,mainSocket);
+		<script>
+				var listeners =
+					[
+						{event: 'sampleData', callback: function(data){
+							console.log(data);
+						}}
+
+					]
+				var mainSocket = new Socket('http://localhost:4040','default','main',true,listeners);
+				var secondarySocket = new Socket('http://localhost:4040','default','secondary',false);
+	
+			
+
+				mainSocket.sendToServer('sendData','dataREC',1,incomingData);
+				secondarySocket.sendToServer('test','testReturn',1,function(data){
+					console.log(data);
+				});
+			
+
+			
 
 				function incomingData(data){
-					console.log('in incomingData');
-					console.log(data);
+				
 				}
 
 		</script>

@@ -12,10 +12,8 @@ class SocketManager{
 
 	setRoomEvents(roomDefinitions){
 
-	
-
 		this.io.on('connect',function(socket){
-			
+			console.log(socket.id);
 			var socketRoom = socket.handshake.query.room;
 			socket.join(socketRoom);
 		
