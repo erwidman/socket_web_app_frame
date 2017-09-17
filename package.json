@@ -19,6 +19,8 @@
   "dependencies": {
     "express": "*",
     "jquery": "^3.2.1",
+    "jsonpath": "^0.2.12",
+    "lzutf8": "^0.4.6",
     "socket.io": "*",
     "striptags": "*",
     "validator": "*",
