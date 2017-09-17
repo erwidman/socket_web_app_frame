@@ -17,8 +17,10 @@
   },
   "homepage": "https://github.com/widmanneric/socket_web_app_frame#readme",
   "dependencies": {
+    "bootstrap": "^3.3.7",
     "express": "*",
     "jquery": "^3.2.1",
+    "jquery-ui": "^1.12.1",
     "jsonpath": "^0.2.12",
     "lzutf8": "^0.4.6",
     "socket.io": "*",
