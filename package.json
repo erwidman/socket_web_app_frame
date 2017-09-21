@@ -17,14 +17,18 @@
   },
   "homepage": "https://github.com/widmanneric/socket_web_app_frame#readme",
   "dependencies": {
+    "asn1": "^0.2.3",
     "bootstrap": "^3.3.7",
+    "bufferutil": "^3.0.2",
     "express": "*",
     "jquery": "^3.2.1",
     "jquery-ui": "^1.12.1",
     "jsonpath": "^0.2.12",
     "lzutf8": "^0.4.6",
+    "mysql": "^2.14.1",
     "socket.io": "*",
     "striptags": "*",
+    "utf-8-validate": "^3.0.3",
     "validator": "*",
     "vm": "*"
   }
