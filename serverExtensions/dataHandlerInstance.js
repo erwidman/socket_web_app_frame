@@ -2,23 +2,26 @@
 
 //____________________________________________________YOUR_CODE_HERE
 var DataHandler = require('./objects/dataHandler.js');
-var dHandler = new DataHandler(); 
-console.log('DataHandler instantiated!');
-var testData =
-{
-	'Eric' : '1',
-	'Tom' :' 2'
-};
-dHandler.instantiateBackup('internal-dev.cmdjf9dcmjok.us-east-1.rds.amazonaws.com',
-							"bowling_user",
-							"QxeZsMyH78hKcbw",
-							'bowling');
-dHandler.saveObject('test',testData,function(err){
-	if(!err){
-		dHandler.backupFile("test");
-	}
+// var dHandler = new DataHandler('internal-dev.cmdjf9dcmjok.us-east-1.rds.amazonaws.com',
+// 							"bowling_user",
+// 							"QxeZsMyH78hKcbw",
+// 							'bowling'); 
+// dHandler.instantiateBackup('internal-dev.cmdjf9dcmjok.us-east-1.rds.amazonaws.com',
+// 							"bowling_user",
+// 							"QxeZsMyH78hKcbw",
+// 							'bowling');
 
-});
+// var stores = dHandler.readObject('stores',function(data){
+// 	console.log(data);
+// });
+
+
+
+// dHandler.saveObject('test',testData,function(err){
+// 	if(!err){
+// 		dHandler.backupFile("test");
+// 	}
+// });
 
 
 
@@ -26,7 +29,7 @@ dHandler.saveObject('test',testData,function(err){
 //____________________________________________________EXAMPLE
 //
 // var stores = {
-//   "store": {
+//   "walmart": {
 //     "book": [ 
 //       {
 //         "category": "reference",
@@ -59,10 +62,15 @@ dHandler.saveObject('test',testData,function(err){
 //   }
 // };
 
-// dHandler.saveObject('stores',stores);
+// dHandler.saveObject('stores',stores,function(err){
+// 	dHandler.backupFile('stores');
+// });
+
+// dHandler.loadFileFromBackup('stores',function(res){
+// 	console.log(res);
+// });
 
 // setTimeout(function(){
-	
 // 	dHandler.queryObject('stores','$..book[?(@.price<10)]',function(data){
 // 		console.log(data);
 // 	});

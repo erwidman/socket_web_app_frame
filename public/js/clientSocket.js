@@ -45,7 +45,7 @@ class Socket{
 
 
 
-	sendToServer(event,killEvent,data,callback){
+	sendToServer(event,killEvent,data, callback){
 		
 		if(this.emitEnabled){
 
@@ -69,7 +69,7 @@ class Socket{
 		}
 		else{
 			setTimeout(function(socket){
-				socket.sendToServer(event,killEvent,data,callback);
+				socket.sendToServer(event,data,killEvent, callback);
 			},100,this);
 		}
 

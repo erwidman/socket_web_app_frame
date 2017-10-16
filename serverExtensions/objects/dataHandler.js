@@ -4,8 +4,12 @@ var fs = require('fs');
 var db = require('mysql');
 
 class DataHandler{
-	constructor(){
-		this.isBackup = false;
+	constructor(host,user,password,database){
+		if(host && user && password && database){
+			this.instantiateBackupSQL(host,user,password,database);
+		}
+		console.log('DATAHANDLER INSTANTIATED!');
+		
 	}
 	queryObject(filename,queryString,callback){
 		fs.readFile('json/'+filename+'.lz','utf8',function(err,data){
@@ -48,10 +52,12 @@ class DataHandler{
 	}
 
 
-	instantiateBackup(host,user,password,database){
+	instantiateBackupMYSQL(host,user,password,database){
 
+	
 		if(this.con)
-			this.con.destroy();
+			return;
+
 
 		this.host = host;
 		this.user = user; 
@@ -64,10 +70,11 @@ class DataHandler{
 			database : database
 		});
 
+		var it = this;
 		this.con.on('error',function(err){
 			if(err.fatal){
 				console.log('FATAL DB ERROR ~ RECONNECTING!');
-				this.reconnectToDB();
+				it.reconnectToDB();
 			}
 			else
 				console.log('DB ENCOUNTERED NOT FATAL ERROR!');
@@ -76,34 +83,45 @@ class DataHandler{
 	}
 
 	reconnectToDB(){
+
 		console.log('RECONNECTING TO DB!');
-		if(this.con)
-			this.con.destroy();
+		if(this.con){
+			this.con.end(function(err){
+				if(!err){
+					console.log('CONNECTION DISSCONNECTED!');
+					setConnection();
+				}
+				else
+					console.log(err);
+			});
+		}
 
-		this.con = db.createPool({
-			host : this.host,
-			user: this.user,
-			password: this.password,
-			database: this.database
-		});
+		var it = this;
+		function setConnection(){
+			it.con = db.createPool({
+				host : it.host,
+				user: it.user,
+				password: it.password,
+				database: it.database
+			});
 
 
-		this.con.on("error", function(err) {
+			it.con.on("error", function(err) {
 
-			if (err.fatal){ 
-				console.log('FATAL DB ERROR ~ RECONNECTING!');
-				this.reconnectToDB();
+				if (err.fatal){ 
+					console.log('FATAL DB ERROR ~ RECONNECTING!');
+					it.reconnectToDB();
 		
-			}
-			else{
-				console.log('DB ENCOUNTERED NOT FATAL ERROR!');
-			}
-		});
-		
+				}
+				else{
+					console.log('DB ENCOUNTERED NOT FATAL ERROR!');
+				}
+			});
+		}
 	}
 
 
-	backupFile(filename){
+	backupFileMYSQL(filename){
 		var it = this;
 		this.con.getConnection(function(err,primary_connection){
 			if(!err){
@@ -112,25 +130,46 @@ class DataHandler{
 					
 					var backupObject = data;
 					var tmpArray = [];
+					var tmpArray2 = [];
 
 
 					for(var key in backupObject){
 						tmpArray.push([key,JSON.stringify(backupObject[key])]);
+						tmpArray2.push([key]);
 					}
 
 					//check existence of table
 					primary_connection.query('select count(*) from ' +filename,function(err,result){
 						if(!err){
 							console.log('TABLE EXIST!');
-							primary_connection.release();
-							//TODO SET NEW DATA
+							var sql = 'INSERT INTO '+ filename + ' (title, info) VALUES ? ON DUPLICATE KEY UPDATE info = VALUES(info)';
+							primary_connection.query(sql, [tmpArray],function(err, result){
+								if(!err){
+									console.log('TABLE UPDATED!');
+									sql = 'Delete from ' + filename + ' where title not in ?';
+									primary_connection.query(sql,[tmpArray2],function(err,result){
+										if(!err){
+											console.log('DELETED OLD ROWS!');
+										}
+										else
+											console.log(err);
+										primary_connection.release();
+									});
+
+								}
+								else{
+									console.log(err);
+									primary_connection.release();
+								}
+							});	
+			
 						}
 						else{
 							console.log('TABLE DOES NOT EXIST!');
 							var sql = 'CREATE TABLE ' + filename +  ' (id INT NOT NULL AUTO_INCREMENT ,title varchar(255) NOT NULL UNIQUE, info JSON, PRIMARY KEY (id))';
 							primary_connection.query(sql,function(err,result){
 								if(!err){
-									console.log('TABLE CREATED!')
+									console.log('TABLE CREATED!');
 									sql = 'INSERT INTO '+ filename + '(title, info) VALUES ?';
 									primary_connection.query(sql,[tmpArray],function(err){
 										if(!err){
@@ -147,6 +186,29 @@ class DataHandler{
 							});
 						}
 					});
+				});
+			}
+			else
+				console.log('FAILED TO CONNECT!');
+		});
+	}
+
+	loadFileFromBackupMYSQL(filename,callback){
+		this.con.getConnection(function(err,primary_connection){
+			if(!err){
+				var sql = 'Select title, info from ' + filename;
+				primary_connection.query(sql,function(err,res){
+					if(!err){
+						console.log('CONTENTS OF FILE LOADED!');
+						var retMap = {};
+						for(var i in res ){
+							retMap[res[i].title] = JSON.parse(res[i].info) ;
+						}
+						callback(retMap);
+					}
+					else
+						console.log('FAILED TO RETREIVE FILE!');
+					primary_connection.release();
 				});
 			}
 			else
