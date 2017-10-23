@@ -69,7 +69,7 @@ class Socket{
 		}
 		else{
 			setTimeout(function(socket){
-				socket.sendToServer(event,data,killEvent, callback);
+				socket.sendToServer(event,killEvent,data, callback);
 			},100,this);
 		}
 
