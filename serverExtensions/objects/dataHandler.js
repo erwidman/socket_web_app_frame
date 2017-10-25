@@ -6,7 +6,7 @@ var db = require('mysql');
 class DataHandler{
 	constructor(host,user,password,database){
 		if(host && user && password && database){
-			this.instantiateBackupSQL(host,user,password,database);
+			this.instantiateBackupMYSQL(host,user,password,database);
 		}
 		console.log('DATAHANDLER INSTANTIATED!');
 		

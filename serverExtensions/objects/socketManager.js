@@ -4,6 +4,7 @@ var clients = {};
 class SocketManager{
 	constructor(app){		
 		this.io = require('socket.io')(app);
+		this.siofu = require('socket.io-file');
 	}
 
 	getIO(){
@@ -43,6 +44,29 @@ class SocketManager{
 	globalRespond(event,data){
 		data = JSON.stringify(data);
 		this.io.emit(event,data);
+	}
+
+	createFileStream(uploadDir,acceptedfiles,maxFileSize,overwrite,stremCallback){
+		this.io.on('connection',function(socket){
+			var fileStream = new SocketIOFile(socket,{
+				uploadDir : uploadDir,
+				accepts : acceptedFiels,
+				maxFileSize : maxFileSize,
+				chunkSize: 10240,
+				transmissionDelay: 0,
+				overwrite: overwrite
+			});
+
+			fileStream.on("start",function(fileInfo){
+				console.log('::STARTING FILE UPLOAD!');
+			});
+
+			fileStream.on('stream',function(fileInfo){
+				streamCallback(fileInfo);
+			});
+
+		});
+		
 	}
 
 }
