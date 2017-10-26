@@ -28,6 +28,7 @@
     "lzutf8": "^0.4.6",
     "mysql": "^2.14.1",
     "socket.io": "*",
+    "socket.io-file": "^2.0.15",
     "striptags": "*",
     "utf-8-validate": "^3.0.3",
     "validator": "*",

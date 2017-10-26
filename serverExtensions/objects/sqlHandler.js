@@ -79,9 +79,8 @@ class SQLHandler{
 						console.log("::FAILED TO MAKE QUERY");
 					else{
 						conn.release();
-						callback(err,result);
-
 					}
+					callback(err,result);
 				});
 			}
 		});
