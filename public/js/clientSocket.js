@@ -3,20 +3,20 @@ var jQuery = require('jquery');
 
 class Socket{
 	
-	constructor(ip,room,type,persist,listeners){
+	constructor(options){
 		
-		this.ip = ip;
-		this.room = room;
-		this.persist = persist;
-		this.query = {query:'room='+room+'&type='+type};
+		this.ip = options.ip;
+		this.room = options.room;
+		this.persist = options.persist;
+		this.query = {query:'room='+options.room+'&type='+options.type};
 		var query = this.query;
 
 		setSocket(this);
-		var scriptURL = ip+'/socket.io/socket.io.js';
+		var scriptURL = options.ip+'/socket.io/socket.io.js';
 		var tmpSocket;
 		jQuery.getScript(scriptURL,function(data,textStatus,jqxhr){
-				 tmpSocket =  io.connect(ip,query);
-				 if(!persist){
+				 tmpSocket =  io.connect(options.ip,query);
+				 if(!options.persist){
 					 tmpSocket.once('connect',function(){
 						this.io.disconnect();
 					});
@@ -33,8 +33,11 @@ class Socket{
 				if(tmpSocket){
 					s.emitEnabled = true;
 					s.sok = tmpSocket;
-					if(listeners)
-						s.setListeners(listeners);
+					if(options.listeners)
+						s.setListeners(options.listeners);
+					if(options.streamOptions){
+				 		s.setUploaderSettings(options.streamOptions);
+				 	}
 				}
 				else{
 					setSocket(s);
@@ -104,6 +107,42 @@ class Socket{
 
 	reloadSocket(){
 		this.sok =  io.connect(this.ip,this.query);
+	}
+
+	setUploaderSettings(options){
+		
+		if(!this.uploader)
+			this.uploader = new SocketIOFileClient(this.sok);
+
+		this.uploader.off('start stream complete error abort');
+		
+		this.uploader.on('start',function(fileInfo){
+			console.log("::STARTING UPLOAD");
+			if(options.start)
+				options.start(fileInfo);
+		});
+		this.uploader.on('stream',function(fileInfo){
+			console.log("::STARTING STREAM");
+			if(options.stream)
+				options.stream(fileInfo);
+		});
+		this.uploader.on('complete',function(fileInfo){
+			console.log("::COMPLETE STREAM");
+			if(options.complete)
+				options.error('fileInfo');
+		});
+		this.uploader.on('error',function(err){
+			console.log('::ERROR IN STREAM');
+			console.log(err);
+			if(options.error)
+				options.error(err);
+		});
+		this.uploader.on('abort',function(fileInfo){
+			console.log('::ABORT IN STREAM');
+			if(options.abort)
+				options.abort(fileInfo);
+		});
+			
 	}
 
 }//end of class

@@ -2,8 +2,19 @@
 <html>
 
 	<head>	
+	
+	</head>
+	<body>
+
+		<form action="" id="form">
+			<input type="file" multiple id="file">
+			<input type="submit" value="upload">
+		</form>
+
 		<script src="js/bundle.js"></script>
+		<script src="js/socket.io-file-client.js"></script>
 		<script src='js/clientSocket.js'></script>
+
 		<script>
 				var listeners =
 					[
@@ -11,29 +22,29 @@
 							console.log(data);
 						}}
 
-					]
-				var mainSocket = new Socket('http://localhost:4040','default','main',true,listeners);
-				var secondarySocket = new Socket('http://localhost:4040','default','secondary',false);
-	
-			
+					];
+				var mainSocket = new Socket({
+					ip :'http://localhost:4040',
+					room: 'default',
+					type: 'main',
+					persist:true,
+					listeners: listeners,
+					streamOptions : {
+										start : function(){
+											console.log('stream starting');
+										}
+									}
+					});
 
-				mainSocket.sendToServer('sendData','dataREC',1,incomingData);
-				secondarySocket.sendToServer('test','testReturn',1,function(data){
-					console.log(data);
-				});
-			
-
-			
-
-				function incomingData(data){
-				
-				}
-
+				var form  = document.getElementById('form');
+				form.onsubmit = function(ev){
+					ev.preventDefault();
+					var file = document.getElementById('file');
+					mainSocket.uploader.upload(file,{
+						uploadTo : 'images'
+					});
+				};
 		</script>
-	</head>
-	
-	<body>
-			
 	</body>
 
 </html>

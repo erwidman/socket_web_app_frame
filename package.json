@@ -29,6 +29,7 @@
     "mysql": "^2.14.1",
     "socket.io": "*",
     "socket.io-file": "^2.0.15",
+    "socket.io-file-client": "^2.0.13",
     "striptags": "*",
     "utf-8-validate": "^3.0.3",
     "validator": "*",

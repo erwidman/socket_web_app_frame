@@ -15,6 +15,7 @@ function reconnect(host,user,password,database,it){
 
 			});
 		}
+
 }
 
 function loadDB(host,user,password,database,it){
@@ -57,7 +58,7 @@ function loadDB(host,user,password,database,it){
 
 class SQLHandler{
 	constructor(host,user,password,database){
-
+		this.mysql = mysql;
 		this.pool = loadDB(host,user,password,database,this);
 	}
 
