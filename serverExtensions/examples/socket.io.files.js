@@ -9,10 +9,11 @@ module.exports = function(server){
 
 function init(){
 	manager.createFileStream({
+	uploadDir :{
 		images : 'data/img',
 		videos : 'data/videos'
 	},
-	['image/jpeg'],
-	4194304,
-	true);
+	acceptedFiles : ['image/jpeg'],
+	maxFileSize: 4194304,
+	overwrite : true});
 }

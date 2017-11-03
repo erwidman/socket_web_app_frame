@@ -139,8 +139,15 @@ class SocketManager{
 			},
 	  	type: the socket type that the file stream applies too
 	*/
-	createFileStream(uploadDir,acceptedfiles,maxFileSize,overwrite,callbacks,type){
-		
+	//createFileStream(uploadDir,acceptedfiles,maxFileSize,overwrite,rename,callbacks,type){
+	createFileStream(options){
+		var uploadDir = options.uploadDir;
+		var acceptedfiles = options.acceptedFiles;
+		var maxFileSize = options.maxFileSize;
+		var overwrite = options.overwrite;
+		var rename = options.rename;
+		var callbacks = options.callbacks;
+		var type = options.type;
 		this.io.on('connection',function(socket){
 			
 			if(type && type == socket.handshake.query.type)
