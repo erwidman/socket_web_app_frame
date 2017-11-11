@@ -97,7 +97,7 @@ class SocketManager{
 		@params
 		event: name of event
 		data: data to be sent 
-	*/
+	*/	
 	globalRespond(event,data){
 		data = JSON.stringify(data);
 		this.io.emit(event,data);

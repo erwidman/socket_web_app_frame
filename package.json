@@ -31,6 +31,7 @@
     "socket.io-file": "^2.0.15",
     "socket.io-file-client": "^2.0.13",
     "striptags": "*",
+    "tiny-worker": "^2.1.1",
     "utf-8-validate": "^3.0.3",
     "validator": "*",
     "vm": "*"
