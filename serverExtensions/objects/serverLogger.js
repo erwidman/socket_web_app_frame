@@ -20,7 +20,6 @@ class serverLogger{
 			}
 		}
 
-
 		var dirExist = false;
 		fs.stat('log',function(err,stats){
 			if(err){

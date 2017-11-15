@@ -122,23 +122,18 @@ class Socket{
 				options.start(fileInfo);
 		});
 		this.uploader.on('stream',function(fileInfo){
-			console.log("::STARTING STREAM");
 			if(options.stream)
 				options.stream(fileInfo);
 		});
 		this.uploader.on('complete',function(fileInfo){
-			console.log("::COMPLETE STREAM");
 			if(options.complete)
-				options.error('fileInfo');
+				options.complete(fileInfo);
 		});
 		this.uploader.on('error',function(err){
-			console.log('::ERROR IN STREAM');
-			console.log(err);
 			if(options.error)
 				options.error(err);
 		});
 		this.uploader.on('abort',function(fileInfo){
-			console.log('::ABORT IN STREAM');
 			if(options.abort)
 				options.abort(fileInfo);
 		});

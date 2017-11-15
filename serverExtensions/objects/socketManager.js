@@ -97,7 +97,7 @@ class SocketManager{
 		@params
 		event: name of event
 		data: data to be sent 
-	*/	
+	*/
 	globalRespond(event,data){
 		data = JSON.stringify(data);
 		this.io.emit(event,data);
@@ -181,13 +181,13 @@ class SocketManager{
 			});
 
 			fileStream.on('error',function(fileInfo){
-				if(callback&& callbacks.error);
+				if(callback&& callbacks.error)
 					callbacks.error(fileInfo);
 			});
 
 			fileStream.on('abort',function(fileInfo){
 				console.log("::UPLOAD ABORTED!");
-				if(callback && callbacks.error)
+				if(callback && callbacks.abort)
 					callbacks.abort(fileInfo);
 			});
 

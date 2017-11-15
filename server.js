@@ -10,7 +10,7 @@ app.use(express.static('socket.io/socket.io.js'));
 
 server.listen(4040);
 
-require('./serverExtensions/serverApplication.js')(server);
+require('./serverExtensions/tester.js')();
 // require('./serverExtensions/socket.ioInstance.js')(server);
 
 
