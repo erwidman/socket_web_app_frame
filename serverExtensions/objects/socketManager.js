@@ -4,14 +4,16 @@
 	Used to manage socket.io connections and events
 
 	@params
-	app : active http server object
+	app : active http server object or port
 */
 var clients = {};
 const SocketIOFile =  require('socket.io-file');
 
 
 class SocketManager{
-	constructor(app){		
+	
+	constructor(app){
+
 		this.io = require('socket.io')(app);
 	}
 
@@ -46,7 +48,7 @@ class SocketManager{
 	setRoomEvents(roomDefinitions){
 
 		this.io.on('connect',function(socket){
-			console.log(socket.id);
+			console.log("::SOCKET " + socket.id + " CONNECTED!");
 			var socketRoom = socket.handshake.query.room;
 			socket.join(socketRoom);
 		

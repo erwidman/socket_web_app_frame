@@ -27,6 +27,7 @@
     "livereload": "^0.6.3",
     "lzutf8": "^0.4.6",
     "mysql": "^2.14.1",
+    "node-schedule": "^1.2.5",
     "socket.io": "*",
     "socket.io-file": "^2.0.15",
     "socket.io-file-client": "^2.0.13",

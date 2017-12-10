@@ -10,40 +10,34 @@ class Socket{
 		this.persist = options.persist;
 		this.query = {query:'room='+options.room+'&type='+options.type};
 		var query = this.query;
+		var it = this;
 
-		setSocket(this);
+		function setSocket(tmpSocket){
+
+			
+			it.emitEnabled = true;
+			it.sok = tmpSocket;
+			if(options.listeners)
+				it.setListeners(options.listeners);
+			if(options.streamOptions){
+		 		it.setUploaderSettings(options.streamOptions);
+		 	}
+		
+		
+		}
+
 		var scriptURL = options.ip+'/socket.io/socket.io.js';
 		var tmpSocket;
 		jQuery.getScript(scriptURL,function(data,textStatus,jqxhr){
-				 tmpSocket =  io.connect(options.ip,query);
+				 let tmpSocket =  io.connect(options.ip,query);
+				 setSocket(tmpSocket);
 				 if(!options.persist){
 					 tmpSocket.once('connect',function(){
 						this.io.disconnect();
 					});
 				}
-
 		});
-
-		//attempt to set sok variable 
-		var waitFunction;
-		function setSocket(s){
-			clearTimeout(waitFunction);
-			waitFunction = 
-			setTimeout(function(){
-				if(tmpSocket){
-					s.emitEnabled = true;
-					s.sok = tmpSocket;
-					if(options.listeners)
-						s.setListeners(options.listeners);
-					if(options.streamOptions){
-				 		s.setUploaderSettings(options.streamOptions);
-				 	}
-				}
-				else{
-					setSocket(s);
-				}
-			},100);
-		}
+	
 	}
 
 

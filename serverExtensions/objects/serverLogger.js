@@ -1,26 +1,38 @@
 const fs = require('fs');
-const io = require('socket.io');
-const Worker = require('tiny-worker');
+const SocketManger = require('./socketManager.js');
+//const Worker = require('tiny-worker');
 
-class serverLogger{
+class ServerLogger{
 
-	constructor(printToConsole){
-		
-		this.directoryExist = false;
+	constructor(printToConsole,port,ready){
+		var it = this;
 		this.printToConsole = printToConsole;
+		this.serverReady = false;
+		this.logFileExist = false;
 
 
+		function _initSocketServer(){
+			it.sManager = new SocketManger(port);
+			it.sManager.setRoomEvents({
+				'server_logger' :
+					{
+						events: 
+						[
+							{
+								name : 'getTail',
+								callback : function(data){
+									sManager.respond(data.returnEvent,true,this);
+								}
+							}
+						]
+					}
+			});
+			it.serverReady = true;
+			ready();
 
-		var directoryCheck = setInterval(_directoryExist,30,this);
-		function _directoryExist(it){
-			if(dirExist){
-				console.log("::CLEARING DIRECTOY CHECK FUNCTION")
-				it.directoryExist = true;
-				clearInterval(directoryCheck);
-			}
 		}
 
-		var dirExist = false;
+
 		fs.stat('log',function(err,stats){
 			if(err){
 				console.log("::CREATING DIRECTORY FOR SERVER LOG");
@@ -28,66 +40,59 @@ class serverLogger{
 					if(err)
 						console.log('::FAILED TO CREATE DIRECTORY');
 					else{
-						dirExist = true;
 						console.log('::LOG DIRECTORY CREATED!');
+						_initSocketServer();
 					}
 				});
 			}
 			else{
-				dirExist = true;
-				console.log("::LOG DIRECTORY EXIST")
+				console.log("::LOG DIRECTORY EXIST");
+				_initSocketServer();
 			}
 		});
-
-
-
-		//inline-worker
-		this.worker = new Worker(function(){
-			const fs = require('fs');
-			self.onmessage = function(ev){	
-				fs.appendFile('log/log.txt',ev.data + '\n',function(err){
-						if(err)
-							postMessage("FAILED");
-						else
-							postMessage("::SUCCESSFUL LOG");
-				});
-			}
-		});
-
-
-		this.worker.onmessage = function(ev){
-				if(ev.data == 'FAILED'){
-					console.log("::LOGGER FAILURE");
-					this.terminate();
-				}
-		}
-
 
 
 	}
 
 	log(msg){
-	
-		//console.log(this.worker);
-		if(!this.directoryExist){
+		var it = this;
+		if(!this.serverReady){
+			console("::LOG SERVER NOT READY FOR OPERATION");
 			return;
 		}
 
-		if(this.printToConsole)
-			console.log(msg);
+		if(!this.logFileExist){
+		 	fs.open('log/log.txt','wx',function(err,fd){
+		 		if(err){
+		 			console.log("::FILE ALREADY EXIST");
+		 			return;
+		 		}
+				fs.close(fd,function(err){
+					console.log("::FILE CLOSED");
+				});
+		 		it.logFileExist = true;
+		 	});
+	 	}
 
-		setTimeout(function(it){
-			it.worker.postMessage(msg);
-		},2000,this);
+
+	 	fs.appendFile('log/log.txt','\n'+msg,function(err){
+	 		if(err)
+	 			console.log("::FAILED TO APPEND TO LOG.TXT");
+	 	})
+
+	 	this.sManager.globalRespond("serverLOG",{'msg':'\n'+msg});
+
+	 	if(this.printToConsole)
+	 		console.log(msg);
 		
 	}
 
-
-	killWorker(){
-		this.worker.terminate();
+	isReady(){
+		return this.serverReady;
 	}
+
 
 
 }
 
-module.exports = serverLogger;
+module.exports = ServerLogger;
