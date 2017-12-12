@@ -1,5 +1,6 @@
 const fs = require('fs');
 const SocketManger = require('./socketManager.js');
+const {spawn} = require('child_process');
 //const Worker = require('tiny-worker');
 
 class ServerLogger{
@@ -21,7 +22,16 @@ class ServerLogger{
 							{
 								name : 'getTail',
 								callback : function(data){
-									sManager.respond(data.returnEvent,true,this);
+
+									var requestingSocket = this;
+									var outerData = data
+									const child = spawn('tail',['-n','50','log/log.txt']);
+									child.stdout.on('data',function(data){
+										it.sManager.respond(outerData.returnEvent,data.toString('utf-8'),requestingSocket);
+									});
+									child.stderr.on('data',function(data){
+										console.log(data.toString('utf-8'));
+									});
 								}
 							}
 						]
@@ -65,6 +75,7 @@ class ServerLogger{
 		 	fs.open('log/log.txt','wx',function(err,fd){
 		 		if(err){
 		 			console.log("::FILE ALREADY EXIST");
+		 			it.logFileExist = true;
 		 			return;
 		 		}
 				fs.close(fd,function(err){

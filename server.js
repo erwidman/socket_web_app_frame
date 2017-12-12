@@ -12,9 +12,13 @@ server.listen(4040);
 
 const ServerLogger = require('./serverExtensions/objects/serverLogger.js');
 var logger = new ServerLogger(true,8000,function(){
-	setTimeout(function(){
-		logger.log("::A FORMAL TEST OF THE SYSTEM");
-	},30*1000);
+	var index = 0;
+	setInterval(() => {
+		logger.log(index);
+		index++;
+	},3000);
+		
+
 });
 
 //require('./serverExtensions/tester.js')();

@@ -54,6 +54,7 @@ class SocketManager{
 		
 			var def = roomDefinitions[socket.handshake.query.type];
 			if(def){
+
 				if(def.alwaysJoin)
 					socket.join(def.alwaysJoin);
 				for(var i in def.events){
